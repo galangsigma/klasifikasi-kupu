@@ -4,15 +4,15 @@ from PIL import Image
 import numpy as np
 import time
 
-# 1. Konfigurasi Halaman & Tema
-st.set_page_config(page_title="Butterfly AI Classifier", page_icon="🦋", layout="wide")
+# 1. Konfigurasi Halaman (Centered agar fokus di tengah)
+st.set_page_config(page_title="Butterfly AI Classifier", page_icon="🦋", layout="centered")
 
-# 2. Suntikan CSS Kustom (Diperkaya untuk mengisi ruang)
+# 2. Custom CSS untuk Tampilan Rapi & Modern (Tanpa Sidebar)
 st.markdown("""
     <style>
     .stApp {
         background-color: #0f172a;
-        color: #e2e8f0;
+        color: #f1f5f9;
     }
     
     .main-title {
@@ -25,57 +25,44 @@ st.markdown("""
         margin-bottom: 0px;
     }
 
-    /* Kartu Statistik di Sidebar */
-    .stat-card {
-        background: rgba(255, 255, 255, 0.03);
-        padding: 15px;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        margin-bottom: 10px;
-    }
-    
     .glass-card {
         background: rgba(30, 41, 59, 0.7);
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 2rem;
+        padding: 2.5rem;
         border-radius: 1.5rem;
-        border-left: 5px solid #38bdf8;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        margin-top: 20px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    .stButton>button {
+        width: 100%;
+        background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+        color: #0f172a !important;
+        font-weight: bold;
+        border-radius: 0.75rem;
+        border: none;
+        padding: 0.7rem;
+        font-size: 1.1rem;
+        transition: 0.3s;
     }
     
-    /* Membuat area upload lebih menarik */
-    .stFileUploader {
+    .stButton>button:hover {
+        transform: scale(1.02);
+        box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.4);
+    }
+
+    .upload-box {
         border: 2px dashed #38bdf8;
         border-radius: 15px;
-        padding: 10px;
+        padding: 20px;
+        text-align: center;
+        background: rgba(56, 189, 248, 0.05);
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Sidebar (Mengisi ruang kosong di kiri)
-with st.sidebar:
-    st.markdown("## 📊 Info Model")
-    st.markdown("""
-    <div class="stat-card">
-        <small>Arsitektur</small><br>
-        <b>MobileNetV2</b>
-    </div>
-    <div class="stat-card">
-        <small>Jumlah Kelas</small><br>
-        <b>75 Spesies</b>
-    </div>
-    <div class="stat-card">
-        <small>Input Size</small><br>
-        <b>224x224 px</b>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.divider()
-    st.markdown("## 🛠️ Cara Kerja")
-    st.info("Model ini mengekstraksi fitur pola sayap dan warna untuk menentukan spesies dengan probabilitas tertinggi.")
-
-# 4. Load Model
+# 3. Fungsi Load Model
 @st.cache_resource
 def load_model():
     return tf.keras.models.load_model('kupukupu_model.h5')
@@ -83,38 +70,23 @@ def load_model():
 model = load_model()
 labels = ['ADONIS', 'AFRICAN GIANT SWALLOWTAIL', 'AMERICAN SNOOT', 'AN 88', 'APPOLLO', 'ATALA', 'BANDED ORANGE HELICONIAN', 'BANDED PEACOCK', 'BECKERS WHITE', 'BLACK HAIRSTREAK', 'BLUE MORPHO', 'BLUE SPOTTED CROW', 'BROWN SIPROETA', 'CABBAGE WHITE', 'CAIRNS BIRDWING', 'CHECQUERED SKIPPER', 'CHESTNUT', 'CLEOPATRA', 'CLODIUS PARNASSIAN', 'CLOUDED SULPHUR', 'COMMON BANDED AWL', 'COMMON WOOD-NYMPH', 'COPPER TAIL', 'CRECENT', 'CRIMSON PATCH', 'DANAID EGGFLY', 'EASTERN COMA', 'EASTERN DAPPLE WHITE', 'EASTERN PINE ELFIN', 'ELBOWED PIERROT', 'GOLD BANDED', 'GREAT EGGFLY', 'GREAT JAY', 'GREEN CELLED CATTLEHEART', 'GREY HAIRSTREAK', 'INDRA SWALLOW', 'IPHICLUS SISTER', 'JULIA', 'LARGE MARBLE', 'MALACHITE', 'MANGROVE SKIPPER', 'MESTRA', 'METALMARK', 'MILBERTS TORTOISESHELL', 'MONARCH', 'MOURNING CLOAK', 'ORANGE OAKLEAF', 'ORANGE TIP', 'ORCHARD SWALLOW', 'PAINTED LADY', 'PAPER KITE', 'PEACOCK', 'PINE WHITE', 'PIPEVINE SWALLOW', 'POPINJAY', 'PURPLE HAIRSTREAK', 'PURPLISH COPPER', 'QUESTION MARK', 'RED ADMIRAL', 'RED CRACKER', 'RED POSTMAN', 'RED SPOTTED PURPLE', 'SCARCE SWALLOW', 'SILVER SPOT SKIPPER', 'SLEEPY ORANGE', 'SOOTYWING', 'SOUTHERN DOGFACE', 'STRAITED QUEEN', 'TROPICAL LEAFWING', 'TWO BARRED FLASHER', 'ULYSES', 'VICEROY', 'WOOD SATYR', 'YELLOW SWALLOW TAIL', 'ZEBRA LONG WING']
 
-# 5. Antarmuka Utama (Layout Kolom)
+# 4. Header Utama
 st.markdown('<h1 class="main-title">Butterfly AI Classifier</h1>', unsafe_allow_html=True)
-st.markdown('<p style="text-align: center; color: #94a3b8; font-size: 1.2rem;">Sistem Identifikasi Spesies Otomatis Berbasis Deep Learning</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align: center; color: #94a3b8; font-size: 1.1rem; margin-top: 10px;">Sistem Klasifikasi Spesies Kupu-Kupu</p>', unsafe_allow_html=True)
+st.write("---")
 
-st.divider()
+# 5. Konten Tengah
+# Area Upload
+uploaded_file = st.file_uploader("", type=["jpg", "png", "jpeg"])
 
-col1, col2 = st.columns([1, 1], gap="large")
-
-with col1:
-    st.markdown("### 📤 Input Gambar")
-    uploaded_file = st.file_uploader("", type=["jpg", "png", "jpeg"])
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
     
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file)
-        st.image(image, caption='Preview Gambar', use_container_width=True)
-    else:
-        st.markdown("""
-            <div style="background: rgba(56, 189, 248, 0.1); padding: 40px; border-radius: 15px; text-align: center; border: 1px dashed #38bdf8;">
-                <h1 style="font-size: 50px;">🦋</h1>
-                <p style="color: #38bdf8;">Silakan unggah foto untuk memulai</p>
-            </div>
-        """, unsafe_allow_html=True)
-
-with col2:
-    st.markdown("### 🤖 Hasil Identifikasi")
-    if uploaded_file is not None:
-        if st.button('Mulai Analisis Sistem'):
-            progress_bar = st.progress(0)
-            for percent_complete in range(100):
-                time.sleep(0.01)
-                progress_bar.progress(percent_complete + 1)
-            
+    # Tampilkan preview gambar di tengah
+    st.image(image, caption='Gambar yang diunggah', use_container_width=True)
+    
+    if st.button('MULAI IDENTIFIKASI'):
+        with st.spinner('Menganalisis gambar...'):
             # Preprocessing
             img = image.resize((224, 224))
             img_array = np.array(img) / 255.0
@@ -123,25 +95,32 @@ with col2:
             # Prediksi
             predictions = model.predict(img_array)
             score = np.max(predictions)
-            hasil = labels[np.argmax(predictions)]
-
-            # Tampilan Hasil
-            st.markdown(f"""
-                <div class="glass-card">
-                    <p style="color: #38bdf8; font-size: 0.8rem; font-weight: bold; letter-spacing: 2px;">PREDIKSI TERBAIK</p>
-                    <h1 style="color: white; margin-top: -10px; font-size: 2.5rem;">{hasil}</h1>
-                    <div style="background: rgba(52, 211, 153, 0.1); padding: 10px; border-radius: 8px; border: 1px solid #34d399;">
-                        <span style="color: #34d399; font-weight: bold;">Tingkat Keyakinan: {score*100:.2f}%</span>
-                    </div>
-                    <p style="color: #94a3b8; font-size: 0.8rem; mt-3">Identifikasi selesai menggunakan analisis neural network.</p>
-                </div>
-                """, unsafe_allow_html=True)
             
-            if score < 0.5:
-                st.warning("⚠️ Skor rendah. Pastikan objek kupu-kupu terlihat jelas dan dominan.")
-    else:
-        st.write("Menunggu input gambar...")
+            # Logika Skor > 55%
+            if score >= 0.55:
+                hasil = labels[np.argmax(predictions)]
+                
+                st.markdown(f"""
+                    <div class="glass-card">
+                        <p style="color: #38bdf8; font-size: 0.9rem; font-weight: bold; letter-spacing: 2px;">HASIL IDENTIFIKASI</p>
+                        <h1 style="color: white; margin-top: -10px; font-size: 2.8rem;">{hasil}</h1>
+                        <div style="background: rgba(52, 211, 153, 0.1); padding: 15px; border-radius: 10px; border: 1px solid #34d399; margin-top: 15px;">
+                            <span style="color: #34d399; font-weight: bold; font-size: 1.1rem;">Akurasi: {score*100:.2f}%</span>
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
+            else:
+                # Jika skor di bawah 55%
+                st.error("⚠️ Maaf, sistem tidak dapat mengidentifikasi spesies dengan cukup yakin. Pastikan gambar kupu-kupu terlihat jelas.")
+                st.info(f"Keyakinan model hanya {(score*100):.2f}%, di bawah batas minimum 55%.")
 
-# 6. Footer (Tetap rapi)
-st.markdown("<br><br><br>", unsafe_allow_html=True)
-st.markdown("<hr><center style='color: #475569;'>&copy; 2025 Computer Science Project | Binus University</center>", unsafe_allow_html=True)
+else:
+    st.markdown("""
+        <div class="upload-box">
+            <h1 style="font-size: 50px; margin-bottom: 0;">🦋</h1>
+            <p style="color: #38bdf8; font-weight: 500;">Silakan pilih atau tarik gambar ke sini</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+# 6. Footer
+st.markdown("<br><br><hr><center style='color: #475569;'>&copy; 2025 Butterfly AI Project</center>", unsafe_allow_html=True)
