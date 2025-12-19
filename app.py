@@ -8,7 +8,7 @@ st.title("Klasifikasi Spesies Kupu-Kupu 🦋")
 # Load model (pastikan nama file sesuai)
 @st.cache_resource
 def load_model():
-    return tf.keras.models.load_model('model_kupu.h5')
+    return tf.keras.models.load_model('kupukupu_model.h5')
 
 model = load_model()
 
@@ -32,3 +32,4 @@ if uploaded_file is not None:
         hasil = labels[np.argmax(predictions)]
 
         st.success(f"Hasil Prediksi: **{hasil}**")
+
