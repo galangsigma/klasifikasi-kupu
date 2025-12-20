@@ -1,5 +1,7 @@
 import streamlit as st
 import tensorflow as tf
+import tensorflow.keras.preprocessing.image as image
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from PIL import Image
 import numpy as np
 import time
@@ -68,7 +70,83 @@ def load_model():
     return tf.keras.models.load_model('kupukupu_model.h5')
 
 model = load_model()
-labels = ['ADONIS', 'AFRICAN GIANT SWALLOWTAIL', 'AMERICAN SNOOT', 'AN 88', 'APPOLLO', 'ATALA', 'BANDED ORANGE HELICONIAN', 'BANDED PEACOCK', 'BECKERS WHITE', 'BLACK HAIRSTREAK', 'BLUE MORPHO', 'BLUE SPOTTED CROW', 'BROWN SIPROETA', 'CABBAGE WHITE', 'CAIRNS BIRDWING', 'CHECQUERED SKIPPER', 'CHESTNUT', 'CLEOPATRA', 'CLODIUS PARNASSIAN', 'CLOUDED SULPHUR', 'COMMON BANDED AWL', 'COMMON WOOD-NYMPH', 'COPPER TAIL', 'CRECENT', 'CRIMSON PATCH', 'DANAID EGGFLY', 'EASTERN COMA', 'EASTERN DAPPLE WHITE', 'EASTERN PINE ELFIN', 'ELBOWED PIERROT', 'GOLD BANDED', 'GREAT EGGFLY', 'GREAT JAY', 'GREEN CELLED CATTLEHEART', 'GREY HAIRSTREAK', 'INDRA SWALLOW', 'IPHICLUS SISTER', 'JULIA', 'LARGE MARBLE', 'MALACHITE', 'MANGROVE SKIPPER', 'MESTRA', 'METALMARK', 'MILBERTS TORTOISESHELL', 'MONARCH', 'MOURNING CLOAK', 'ORANGE OAKLEAF', 'ORANGE TIP', 'ORCHARD SWALLOW', 'PAINTED LADY', 'PAPER KITE', 'PEACOCK', 'PINE WHITE', 'PIPEVINE SWALLOW', 'POPINJAY', 'PURPLE HAIRSTREAK', 'PURPLISH COPPER', 'QUESTION MARK', 'RED ADMIRAL', 'RED CRACKER', 'RED POSTMAN', 'RED SPOTTED PURPLE', 'SCARCE SWALLOW', 'SILVER SPOT SKIPPER', 'SLEEPY ORANGE', 'SOOTYWING', 'SOUTHERN DOGFACE', 'STRAITED QUEEN', 'TROPICAL LEAFWING', 'TWO BARRED FLASHER', 'ULYSES', 'VICEROY', 'WOOD SATYR', 'YELLOW SWALLOW TAIL', 'ZEBRA LONG WING']
+labels = [
+    "Adonis Butterfly",
+    "African Giant Swallowtail Butterfly",
+    "American Snoot Butterfly",
+    "Anna's Eighty-Eight Butterfly",
+    "Appollo Butterfly",
+    "Atala Butterfly",
+    "Banded Orange Heliconian Butterfly",
+    "Banded Peacock Butterfly",
+    "Beckers White Butterfly",
+    "Black Hairstreak Butterfly",
+    "Blue Morpho Butterfly",
+    "Blue Spotted Crow Butterfly",
+    "Brown Siproeta Butterfly",
+    "Cabbage White Butterfly",
+    "Cairns Birdwing Butterfly",
+    "Checquered Skipper Butterfly",
+    "Chestnut Butterfly",
+    "Cleopatra Butterfly",
+    "Clodius Parnassian Butterfly",
+    "Clouded Sulphur Butterfly",
+    "Common Banded Awl Butterfly",
+    "Common Wood-Nymph Butterfly",
+    "Copper Tail Butterfly",
+    "Crecent Butterfly",
+    "Crimson Patch Butterfly",
+    "Danaid Eggfly Butterfly",
+    "Eastern Coma Butterfly",
+    "Eastern Dapple White Butterfly",
+    "Eastern Pine Elfin Butterfly",
+    "Elbowed Pierrot Butterfly",
+    "Gold Banded Butterfly",
+    "Great Eggfly Butterfly",
+    "Great Jay Butterfly",
+    "Green Celled Cattleheart Butterfly",
+    "Grey Hairstreak Butterfly",
+    "Indra Swallow Butterfly",
+    "Iphiclus Sister Butterfly",
+    "Julia Butterfly",
+    "Large Marble Butterfly",
+    "Malachite Butterfly",
+    "Mangrove Skipper Butterfly",
+    "Mestra Butterfly",
+    "Metalmark Butterfly",
+    "Milberts Tortoiseshell Butterfly",
+    "Monarch Butterfly",
+    "Mourning Cloak Butterfly",
+    "Orange Oakleaf Butterfly",
+    "Orange Tip Butterfly",
+    "Orchard Swallow Butterfly",
+    "Painted Lady Butterfly",
+    "Paper Kite Butterfly",
+    "Peacock Butterfly",
+    "Pine White Butterfly",
+    "Pipevine Swallow Butterfly",
+    "Popinjay Butterfly",
+    "Purple Hairstreak Butterfly",
+    "Purplish Copper Butterfly",
+    "Question Mark Butterfly",
+    "Red Admiral Butterfly",
+    "Red Cracker Butterfly",
+    "Red Postman Butterfly",
+    "Red Spotted Purple Butterfly",
+    "Scarce Swallow Butterfly",
+    "Silver Spot Skipper Butterfly",
+    "Sleepy Orange Butterfly",
+    "Sootywing Butterfly",
+    "Southern Dogface Butterfly",
+    "Straited Queen Butterfly",
+    "Tropical Leafwing Butterfly",
+    "Two Barred Flasher Butterfly",
+    "Ulyses Butterfly",
+    "Viceroy Butterfly",
+    "Wood Satyr Butterfly",
+    "Yellow Swallow Tail Butterfly",
+    "Zebra Long Wing Butterfly",
+]
 
 # 4. Header Utama
 st.markdown('<h1 class="main-title">Butterfly AI Classifier</h1>', unsafe_allow_html=True)
@@ -80,20 +158,21 @@ st.write("---")
 uploaded_file = st.file_uploader("", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
-    image = Image.open(uploaded_file)
+    img = Image.open(uploaded_file)
     
     # Tampilkan preview gambar di tengah
-    st.image(image, caption='Gambar yang diunggah', use_container_width=True)
+    st.image(img, caption='Gambar yang diunggah', use_container_width=True)
     
     if st.button('MULAI IDENTIFIKASI'):
         with st.spinner('Menganalisis gambar...'):
             # Preprocessing
-            img = image.resize((224, 224))
-            img_array = np.array(img) / 255.0
-            img_array = np.expand_dims(img_array, axis=0)
+            img = image.load_img(uploaded_file, target_size=(224, 224))
+            img = image.img_to_array(img)
+            img = np.expand_dims(img, axis=0)
+            img = preprocess_input(img)
 
             # Prediksi
-            predictions = model.predict(img_array)
+            predictions = model.predict(img)
             score = np.max(predictions)
             
             # Logika Skor > 55%
